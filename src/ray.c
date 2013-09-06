@@ -1018,7 +1018,7 @@ void ray_fs_cb(uv_fs_t* req) {
     req->data   = misc; \
     uv_fs_cb cb = (curr == RAY_MAIN) ? NULL : ray_fs_cb ; \
     int rc = uv_fs_##func(loop, req, __VA_ARGS__, cb); \
-    if (rc < 10) return ray_push_error(L, rc); \
+    if (rc < 0) return ray_push_error(L, rc); \
     if (cb) return ray_suspend(curr); \
     else { \
       fs_result(L, req); \
