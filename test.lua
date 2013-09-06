@@ -1,6 +1,8 @@
 local ray = require('ray')
 print(ray)
 
+print(ray.open("/tmp/foo.txt", "w+", "0644"))
+
 f1 = ray.fiber(function()
    for i=1, 10 do
       print("f1 tick: ", i)

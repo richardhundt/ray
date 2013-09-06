@@ -1018,7 +1018,7 @@ void ray_fs_cb(uv_fs_t* req) {
     req->data   = misc; \
     uv_fs_cb cb = (curr == RAY_MAIN) ? NULL : ray_fs_cb ; \
     int rc = uv_fs_##func(loop, req, __VA_ARGS__, cb); \
-    if (rc) return ray_push_error(L, rc); \
+    if (rc < 10) return ray_push_error(L, rc); \
     if (cb) return ray_suspend(curr); \
     else { \
       fs_result(L, req); \
@@ -1628,6 +1628,8 @@ LUALIB_API int luaopen_ray(lua_State* L) {
 
   ngx_queue_init(&RAY_MAIN->queue);
   ngx_queue_init(&RAY_MAIN->fiber_queue);
+
+  uv_default_loop()->data = RAY_MAIN;
 
   luaL_register(L, "ray", ray_funcs);
   return 1;
