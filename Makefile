@@ -1,5 +1,5 @@
 all:
-	git submodule init ./src/uv
+	git submodule update --init ./src/uv
 	make -C ./src
 
 clean:
