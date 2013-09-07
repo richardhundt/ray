@@ -13,25 +13,18 @@ ray_fiber_t* ray_current(lua_State* L) {
 }
 
 int ray_suspend(ray_fiber_t* fiber) {
-  TRACE("suspending: %p\n", fiber);
+  uv_idle_stop(&fiber->hook);
   return lua_yield(fiber->L, lua_gettop(fiber->L));
 }
 
 void ray_sched_cb(uv_idle_t* idle, int status) {
   ray_fiber_t* self = container_of(idle, ray_fiber_t, hook);
-  uv_idle_stop(&self->hook);
   ray_resume(self, LUA_MULTRET);
 }
 
 int ray_ready(ray_fiber_t* fiber) {
   uv_idle_start(&fiber->hook, ray_sched_cb);
   return 1;
-}
-
-int ray_yield(lua_State* L) {
-  ray_fiber_t* fiber = ray_current(L);
-  ray_ready(fiber);
-  return ray_suspend(fiber);
 }
 
 int ray_finish(ray_fiber_t* self) {
@@ -180,7 +173,6 @@ int ray_fiber_new(lua_State* L) {
 
   lua_xmove(L, self->L, lua_gettop(L) - 1);
 
-  ray_ready(self);
   return 1;
 }
 
@@ -1464,7 +1456,6 @@ int ray_agent_free(lua_State* L) {
 
 static luaL_Reg ray_funcs[] = {
   {"self",      ray_self},
-  {"yield",     ray_yield},
   {"fiber",     ray_fiber_new},
   {"timer",     ray_timer_new},
   {"pipe",      ray_pipe_new},
