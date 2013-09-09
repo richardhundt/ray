@@ -86,6 +86,7 @@ typedef union ray_req_u {
 
 #define RAY_STARTED 1
 #define RAY_CLOSED  2
+#define RAY_RUNNING 4
 
 typedef struct ray_fiber_s  ray_fiber_t;
 typedef struct ray_agent_s  ray_agent_t;

@@ -14,6 +14,7 @@ ray_fiber_t* ray_current(lua_State* L) {
 
 int ray_suspend(ray_fiber_t* fiber) {
   uv_idle_stop(&fiber->hook);
+  fiber->flags &= ~RAY_RUNNING;
   return lua_yield(fiber->L, lua_gettop(fiber->L));
 }
 
@@ -82,11 +83,15 @@ int ray_resume(ray_fiber_t* fiber, int narg) {
   void* prev = loop->data;
   loop->data = fiber;
   assert(fiber != RAY_MAIN);
+  fiber->flags |= RAY_RUNNING;
   int rc = lua_resume(fiber->L, narg);
   loop->data = prev;
 
   switch (rc) {
     case LUA_YIELD: {
+      if (fiber->flags & RAY_RUNNING) {
+        ray_ready(fiber);
+      }
       break;
     }
     case 0: {
