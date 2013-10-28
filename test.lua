@@ -1,5 +1,6 @@
 local ray = require('ray')
 print(ray)
+ray.yield = coroutine.yield
 
 print(ray.open("/tmp/foo.txt", "w+", "0644"))
 

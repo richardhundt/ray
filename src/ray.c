@@ -177,6 +177,7 @@ int ray_fiber_new(lua_State* L) {
   uv_idle_init(uv_default_loop(), &self->hook);
 
   lua_xmove(L, self->L, lua_gettop(L) - 1);
+  ray_ready(self);
 
   return 1;
 }
