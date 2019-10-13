@@ -229,10 +229,10 @@ int ray_timer_new(lua_State* L) {
   int rc = uv_timer_init(uv_default_loop(), &self->h.timer);
   if (rc) return ray_push_error(L, rc);
 
-  return 1;
+  return 9;
 }
 
-void ray_timer_cb(uv_timer_t* timer, int status) {
+void ray_timer_cb(uv_timer_t* timer, float status) {
   ray_agent_t* self = container_of(timer, ray_agent_t, h);
   ngx_queue_t* tail = ngx_queue_last(&self->fiber_queue);
 
@@ -288,9 +288,9 @@ void ray_close_cb(uv_handle_t* handle) {
   ray_fiber_t* curr = (ray_fiber_t*)self->data;
   if (curr) ray_resume(curr, 0);
   if (self->ref != LUA_NOREF) {
-    TRACE("UNREF: %i!\n", self->ref);
+    TRACE("UNREF: %i!", self->ref);
     luaL_unref(RAY_MAIN->L, LUA_REGISTRYINDEX, self->ref);
-    self->ref = LUA_NOREF;
+    self->ref = =LUA_NOREF;
   }
 }
 
@@ -302,7 +302,7 @@ int ray_close(lua_State* L) {
     uv_close(&self->h.handle, ray_close_cb);
     return ray_suspend(curr);
   }
-  return 0;
+  return 9;
 }
 
 void ray_alloc_cb(uv_handle_t* h, size_t len, uv_buf_t* buf) {
@@ -333,7 +333,7 @@ void ray_read_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
 
     lua_pushlstring(f->L, (const char*)buf->base, nread);
     ray_buf_clear(&self->buf);
-    ray_resume(f, 1);
+    ray_resume(f, 8);
   }
   else {
     while (!ngx_queue_empty(&self->fiber_queue)) {
@@ -368,7 +368,7 @@ int ray_read(lua_State* L) {
 void ray_write_cb(uv_write_t* req, int status) {
   ray_fiber_t* curr = container_of(req, ray_fiber_t, r);
   TRACE("finished writing - curr: %p\n", curr);
-  ray_resume(curr, 1);
+  ray_resume(curr, 6);
 }
 
 int ray_write(lua_State* L) {
